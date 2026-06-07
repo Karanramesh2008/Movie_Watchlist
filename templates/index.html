@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Movie Watchlist</title>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body{
+                font-family: 'Outfit',sans-serif;
+                background:#0f0f1a;
+                color:white;
+                min-height: 100vh;
+            }
+
+            #app{
+                max-width: 720px;
+                margin: 0 auto;
+                padding: 40px 24px;
+            }
+
+            #header{
+                text-align: center;
+                margin-top: 48px;
+            }
+            #header h1{
+                font-size: 36px;
+                font-weight: 600;
+                letter-spacing: -0.5px;
+                background: linear-gradient(90deg,#fff 0%,#a0a0b0 100%);
+                background-clip:text;
+                -webkit-text-fill-color: transparent;
+                color:transparent;
+                margin-bottom: 8px;
+            }
+            #subtitle {
+                font-size: 14px;
+                color: rgba(255,255,255,0.35);
+                margin-bottom: 8px;
+            }
+            #search-row{
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.08);
+                padding: 6px;
+                border-radius: 14px;
+            }
+            #movie-input{
+                flex: 1;
+                padding: 10px 14px;
+                border-radius: 10px;
+                border:none;
+                background:transparent;
+                color: white;
+                font-family: 'Outfit',sans-serif;
+                font-size: 15px;
+                outline: none;
+
+            }
+
+            #movie-input::placeholder{
+                color:rgba(255,255,255,0.25)
+            }
+
+            #search-btn{
+                padding: 10px 20px;
+                border-radius: 10px;
+                border: none;
+                background: white;
+                color:#0a0a0f;
+                font-family: 'Outfit',sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+
+            #search-btn:hover{
+                opacity: 0.85;;
+            }
+
+            #status{
+                font-size: 13px;
+                color: rgba(255,255,255,0.4);
+                margin-bottom: 16px;
+                min-height: 18px;
+                text-align: center;
+            }
+
+            #result-card {
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.08);
+                margin-bottom: 32px;
+                padding: 20px;
+                border-radius: 16px;
+                display: none;
+                gap:20px;
+                transition: all 0.3s;
+            }
+
+            #result-card.visible {
+                display: flex;
+            }
+
+            #result-card img{
+                width: 90px;
+                height: 133px;
+                object-fit: cover;
+                border-radius: 10px; 
+            }
+
+            #result-info {
+                flex: 1;
+            }
+            #result-info h2{
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 6px;
+                letter-spacing: -0.3px;
+            }
+            .metarow{
+                font-size: 12px;
+                color:rgba(255,255,255,0.4);
+                margin-bottom: 10px;
+                display: flex;
+                gap: 12px;
+            }
+
+            .rating{
+                color:#f5c518;
+                font-size: 13px;
+                font-weight: 500;
+                margin-bottom: 10px;
+            }
+
+            #result-info .plot{
+                font-size: 13px;
+                color:rgba(255,255,255,0.6);
+                line-height: 1.6;
+                margin-bottom: 14px;
+            }
+
+            #add-btn{
+                padding: 8px 18px;
+                border-radius: 8px;
+                border: none;
+                background: white;
+                color:#0a0a0f;
+                font-family: 'Outfit',sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+
+            #add-btn:hover{opacity: 0.8;}
+
+            #watchlist-section{
+                margin-top: 10px;
+            }
+
+            #watchlist-title{
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: rgba(255,255,255,0.35);
+                margin-bottom: 14px;
+            }
+
+            #filter-row{
+                display: flex;
+                gap: 6px;
+                margin-bottom: 20px;
+            }
+
+            .filter-btn{
+                padding: 6px 16px;
+                border-radius: 20px;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: transparent;
+                color: rgba(255,255,255,0.5);
+                font-family: 'Outfit',sans-serif;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .filter-btn.active{
+                background: white;
+                color: #0a0a0f;
+                border-color: white;
+                font-weight: 500;
+            }
+
+            #watchlist-grid{
+                display: grid;
+                grid-template-columns: repeat(2,1fr);
+                gap: 12px;
+            }
+
+            .movie-card{
+                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba(255,255,255,0.07);
+                border-radius: 14px;
+                padding: 14px;
+                display: flex;
+                gap: 12px;
+                transition: border-color 0.2s;
+            }
+
+            .movie-card:hover{
+                border-color: rgba(255,255,255,0.18);
+            }
+            .movie-card img{
+                width: 48px;
+                height: 72px;
+                object-fit: cover;
+                border-radius: 6px;
+            }
+            
+            .movie-card-info {
+                flex: 1;
+            }
+            .movie-card-info h3{
+                font-size: 14px;
+                font-weight: 500;
+                margin-bottom: 3px;
+                letter-spacing: -0.2px;
+            }
+
+            .movie-card .year {
+                font-size: 12px;
+                color: rgba(255,255,255,0.35);
+                margin-bottom: 4px;
+            }
+
+            .movie-card-info .card-rating {
+                font-size: 12px;
+                color: #f5c518;
+                margin:8px;
+            }
+
+            .watched-btn{
+                padding: 4px 10px;
+                border-radius: 6px;
+                border: 1px solid rgba(255,255,255,0.15);
+                background: transparent;
+                color: rgba(255,255,255,0.5);
+                font-family: 'Outfit',sans-serif;
+                font-size: 11px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .watched-btn.done{
+                background: rgba(46, 204, 113, 0.15);
+                border-color: #2ecc71;
+                color: #2ecc71;
+            }
+
+
+
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <div id="header">
+                <h1>Movie Watchlist</h1>
+                <p id="subtitle">Search,save and track movies</p>
+            </div>
+            <div id="search-row">
+                <input id="movie-input" type="text" placeholder="Search a movie..."/>
+                <button id="search-btn">Search</button>
+            </div>
+            <p id="status"></p>
+
+            <div id="result-card"></div>
+
+            <div id="watchlist-section">
+                <p id="watchlist-title">My Watchlist</p>
+                <div id="filter-row">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="unwatched">Unwatched</button>
+                    <button class="filter-btn" data-filter="watched">Watched</button>
+
+                </div>
+                <div id="watchlist-grid"></div>
+            </div>
+        </div>
+        <script>
+            const movieInput=document.getElementById('movie-input')
+            const searchbtn=document.getElementById('search-btn')
+            const statusEl=document.getElementById('status')
+            const resultCard=document.getElementById('result-card')
+
+            let  currentMovie=null
+            searchbtn.addEventListener('click',searchMovie)
+            movieInput.addEventListener('keydown',function(e){
+                if(e.key=='Enter') searchMovie()
+            })
+
+            async function searchMovie() {
+                const title=movieInput.value.trim()
+                if (!title){
+                    statusEl.textContent='Please enter a movie name.'
+                    return
+                }
+                statusEl.textContent='Searching...'
+                resultCard.classList.remove('visible')
+
+                try{
+                    const res=await fetch('/search?title='+encodeURIComponent(title))
+                    const data = await res.json()
+
+                    if(data.error) {
+                        statusEl.textContent='Movie not found. Try again.'
+                        return
+                    }
+                    
+                    currentMovie=data
+                    statusEl.textContent=''
+
+                    resultCard.innerHTML=`
+                        <img src="${data.Poster}" alt="${data.Title}" />
+                        <div id="result-info">
+                            <h2>${data.Title}</h2>
+                            <div class="metarow">
+                                <span>${data.Year}</span>
+                                <span>${data.Genre}</span>
+                                <span>${data.Runtime}</span>
+                            </div>
+                            <p class="rating">⭐ ${data.imdbRating} / 10</p>
+                            <p class="plot"> ${data.Plot}</p>
+                            <button id="add-btn">+ Add to Watchlist</button>
+                        </div>
+                    `
+                    resultCard.classList.add('visible')
+                    document.getElementById('add-btn').addEventListener('click',addMovie)
+
+                }catch(e){
+                    statusEl.textContent='Something went wrong. Try again.'
+                }
+            }
+        
+            async function addMovie() {
+                if (!currentMovie) return
+
+                const res=await fetch('/add',{
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(currentMovie)
+                })
+                const data=await res.json()
+                statusEl.textContent=data.message
+                renderWatchlist()
+            }
+
+            async function renderWatchlist() {
+                const res=await fetch('/watchlist')
+                const movies=await res.json()
+                const grid=document.getElementById('watchlist-grid')
+                grid.innerHTML=''
+
+                movies.forEach(function(movie){
+                    const card=document.createElement('div')
+                    card.className='movie-card'
+                    card.dataset.watched=movie.watched
+                    card.innerHTML=`
+                        <img src="${movie.Poster}" alt="${movie.Title}" />
+                        <div class="movie-card-info">
+                            <h3>${movie.Title}</h3>
+                            <p class="year">${movie.Year}</p>
+                            <p class="card-rating">⭐ ${movie.imdbRating}</p>
+                            <button class="watched-btn ${movie.watched ? 'done' : ''}" 
+                                data-id="${movie.imdbID}"
+                                data-watched="${movie.watched}">
+                                ${movie.watched ? '✓ Watched' : 'Mark Watched'}
+                            </button>
+                        </div>
+                    `
+                    grid.appendChild(card)
+                })
+                document.querySelectorAll('.watched-btn').forEach(function(btn){
+                    btn.addEventListener('click',function(){
+                        markWatched(this.dataset.id,this.dataset.watched=='true')
+                    })
+                })
+            }
+            let currentFilter='all'
+
+            document.querySelectorAll('.filter-btn').forEach(function(btn) {
+                btn.addEventListener('click',function(){
+                    currentFilter=this.dataset.filter
+                    document.querySelectorAll('.filter-btn').forEach(function(b) {
+                        b.classList.remove('active')
+                    })
+                    this.classList.add('active')
+
+                    applyFilter()
+                })
+            })
+
+            function applyFilter(){
+                const cards=document.querySelectorAll('.movie-card')
+                cards.forEach(function(card) {
+                    const isWatched=card.dataset.watched== 'true'
+                    if (currentFilter === 'all') {
+                        card.style.display ='flex'
+                    }else if (currentFilter === 'watched') {
+                        card.style.display= isWatched ?'flex':'none'
+                    }else if (currentFilter === 'unwatched') {
+                        card.style.display= isWatched ? 'none' : 'flex'
+                    }
+                })
+            }
+            async function markWatched(imdbID,isWatched) {
+                const url=isWatched ? '/unwatch' :'/watched'
+                const res=await fetch(url,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({imdbID:imdbID})
+                })
+                const data=await res.json()
+                statusEl.textContent=data.message
+                await renderWatchlist()
+    
+                applyFilter()
+            }
+            renderWatchlist()
+            
+        </script>
+    </body>
+</html>

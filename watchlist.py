@@ -3,14 +3,14 @@ import json
 
 class Watchlist:
     def __init__(self):
-        self.conn=sqlite3.connect("movies.db")
-        self.cursor=self.conn.cursor()
+        self.conn = sqlite3.connect("movies.db")
+        self.cursor = self.conn.cursor()
         self._create_table()
-    
+
     def _create_table(self):
-        self.cursor.execute(" CREATE TABLE IF NOT EXISTS movies (id INTEGER PRIMARY KEY  AUTOINCREMENT,title TEXT NOT NULL,genre TEXT NOT NULL,rating REAL, watched INTEGER DEFAULT 0)")
+        self.cursor.execute(" CREATE TABLE IF NOT EXISTS movies (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,genre TEXT NOT NULL,rating REAL, watched INTEGER DEFAULT 0)")
         self.conn.commit()
-    
+
     def add_movie(self,movie):
         self.cursor.execute("INSERT INTO movies (title,genre,rating) VALUES (?,?,?) ",(movie.title,movie.genre,movie.rating))
         self.conn.commit()
@@ -51,7 +51,7 @@ class Watchlist:
         if not movies:
             print("No Movies available")
             return
-        
+
         print(f"\n -------Results for {gen}------- \n")
         for movie in movies:
             ws="Watched" if movie[4]==1 else "Not Watched"
@@ -63,11 +63,9 @@ class Watchlist:
         movies=self.cursor.fetchall()
         mo_l=[]
         for m in movies:
-            status='Yes' if m[4]==1 else "Not Watched"
+            status='Yes' if m[4]==1 else "No"
             mo_l.append({'id': m[0],'Title': m[1],'Genre': m[2],'Rating': m[3],'Watched': status})
-        
+
         with open("movies.json","w") as f:
             json.dump(mo_l,f,indent=4)
         print(f"\nExported {len(mo_l)} movies to movies.json!\n")
-
-        
